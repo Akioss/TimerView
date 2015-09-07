@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="TimerView">
+        <attr name="iradius" format="dimension"/>
+        <attr name="ibackground" format="color"/>
+        <attr name="idotColor" format="color"/>
+        <attr name="itextColor" format="color"/>
+        <attr name="itextSize" format="dimension"/>
+    </declare-styleable>
+
+</resources>
