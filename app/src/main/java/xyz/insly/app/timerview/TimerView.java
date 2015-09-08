@@ -106,6 +106,9 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
         a.recycle();
 
         paths = new Path[3];
+        for (int i = 0; i < paths.length; i++) {
+            paths[i] = new Path();
+        }
     }
 
     @Override
@@ -221,6 +224,10 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
      */
     private void drawTime(Canvas canvas, float blockw, float blockh, float borderw) {
 
+        paths[0].addRect(0f, 0f, blockw, blockh, Path.Direction.CW);
+        paths[1].addRect(blockw + borderw, 0f, blockw * 2 + borderw, blockh, Path.Direction.CW);
+        paths[2].addRect((blockw + borderw) * 2, 0f, width, blockh, Path.Direction.CW);
+
         canvas.save();
         /**
          * 字体画笔
@@ -231,14 +238,10 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
          * 使时间数字在色块中间
          */
         float tw = mTextPaint.measureText(String.valueOf(mhour));
-        Log.d(TAG, "drawTime: tw: " + tw);
-        Log.d(TAG, "drawTime: height: " + height);
-        Log.d(TAG, "drawTime: textsize: " + textSize);
-        Log.d(TAG, "drawTime: hoffset: " + (height + textSize) / 2);
-//        paths[0].
-//        canvas.drawTextOnPath();
-        canvas.drawText(getHour() + "/" + getMin() + "/" + getSecond(), 0f,
-                (height + textSize) / 2, mTextPaint);
+        canvas.drawTextOnPath(getHour(), paths[0], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
+        canvas.drawTextOnPath(getMin(), paths[1], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
+        canvas.drawTextOnPath(getSecond(), paths[2], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
+
         canvas.restore();
     }
 
