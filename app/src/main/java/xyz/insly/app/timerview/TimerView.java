@@ -28,7 +28,7 @@ import android.widget.TextView;
  * Modified Date:
  * Why & What is modified :
  *****************************************************************************************************************/
-public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnGlobalFocusChangeListener{
+public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocusChangeListener{
 
     private static final String TAG = "TimerView";
 
@@ -49,7 +49,6 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
     /**
      * 用于更新UI
      */
-    private Thread th;
     private boolean isRunning = false;
 
     /**
@@ -57,12 +56,15 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
      */
     private TextPaint mTextPaint;
     private Paint mPaint;
+    private Path[] paths; //文本绘制路径
 
     private int width;
     private int height;
     private float backRadius;
     private int backColor;
     private int dotColor;
+    private float textSize;
+    private int textColor;
 
     /**
      * 时间属性
@@ -95,28 +97,21 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TimerView, defStyle, 0);
 
-        float textSize = a.getDimension(R.styleable.TimerView_itextSize, 32f);
-        int textColor = a.getColor(R.styleable.TimerView_itextColor, 0xff000000);
+        textSize = a.getDimension(R.styleable.TimerView_itextSize, 32f);
+        textColor = a.getColor(R.styleable.TimerView_itextColor, 0xff000000);
         backRadius = a.getDimension(R.styleable.TimerView_iradius, 8f);
         backColor = a.getColor(R.styleable.TimerView_ibackground, 0xffffffff);
         dotColor = a.getColor(R.styleable.TimerView_idotColor, 0xffffffff);
 
         a.recycle();
 
-        /**
-         * 字体画笔
-         */
-        mTextPaint.setTextSize(textSize);
-        mTextPaint.setColor(textColor);
-
-        th = new Thread(this);
-        th.start();
+        paths = new Path[3];
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        width = measureSize(widthMeasureSpec, DEFULT_WIDTH, 0);
-        height = measureSize(heightMeasureSpec, DEFULT_HEIGHT, 0);
+        width = measureSize(widthMeasureSpec, DEFULT_WIDTH, DEFULT_WIDTH);
+        height = (int) (width / 3 * 0.8);
 
         Log.d(TAG, "onMeasure after: width" + width + "height" + height);
 
@@ -132,7 +127,7 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
      * @return 宽高
      */
     public static int measureSize(int measureSpec, int wantSize, int minSize) {
-        int result = 0;
+        int result;
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
 
@@ -227,19 +222,30 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
     private void drawTime(Canvas canvas, float blockw, float blockh, float borderw) {
 
         canvas.save();
-
+        /**
+         * 字体画笔
+         */
+        mTextPaint.setTextSize(textSize);
+        mTextPaint.setColor(textColor);
         /**
          * 使时间数字在色块中间
          */
-        Path path = new Path();
+        float tw = mTextPaint.measureText(String.valueOf(mhour));
+        Log.d(TAG, "drawTime: tw: " + tw);
+        Log.d(TAG, "drawTime: height: " + height);
+        Log.d(TAG, "drawTime: textsize: " + textSize);
+        Log.d(TAG, "drawTime: hoffset: " + (height + textSize) / 2);
+//        paths[0].
 //        canvas.drawTextOnPath();
-
+        canvas.drawText(getHour() + "/" + getMin() + "/" + getSecond(), 0f,
+                (height + textSize) / 2, mTextPaint);
         canvas.restore();
     }
 
     public void setTypeface(Typeface tf) {
         if (mTextPaint != null && mTextPaint.getTypeface() != tf) {
             mTextPaint.setTypeface(tf);
+            invalidate();
         }
     }
 
@@ -249,7 +255,7 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
      * @param times 毫秒数，秒数，分钟数，或小时数
      * @param type  传入类型 MS，S，M，H
      */
-    private void setTime(int times, @TimeType int type) {
+    public void setTime(int times, @TimeType int type) {
 
         switch (type) {
             case TIMETYPE_MS:
@@ -282,6 +288,26 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
     }
 
     /**
+     * 对时间进行格式化 1-01 2-02
+     * @return  时间字符串
+     */
+    private String getDay() {
+        return mday <= 9 && mday >= 0 ? "0" + mday : String.valueOf(mday);
+    }
+
+    private String getHour() {
+        return mhour <= 9 && mhour >= 0 ? "0" + mhour : String.valueOf(mday);
+    }
+
+    private String getMin() {
+        return mmin <= 9 && mmin >= 0 ? "0" + mmin : String.valueOf(mmin);
+    }
+
+    private String getSecond() {
+        return msecond <= 9 && msecond >= 0 ? "0" + msecond : String.valueOf(msecond);
+    }
+
+    /**
      * 倒计时计算
      */
     private void computeTime() {
@@ -305,28 +331,40 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
         return isRunning;
     }
 
+    /**
+     * 启动倒计时
+     */
     public void start() {
         isRunning = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isRunning) {
+                    computeTime();
+                    if (!isTimeOut()) {
+                        invalidateWrap();
+                    }else {
+                        stop();
+                        if (listener != null) {
+                            listener.onTimeOut();
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
+    /**
+     * 结束倒计时
+     */
     public void stop() {
         isRunning = false;
         invalidateWrap();
-    }
-
-    @Override
-    public void run() {
-        while (isRunning) {
-            computeTime();
-            if (!isTimeOut()) {
-                postInvalidateDelayed(1000);
-            }else {
-                isRunning = false;
-                if (listener != null) {
-                    listener.onTimeOut();
-                }
-            }
-        }
     }
 
     /**
@@ -334,11 +372,7 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
      * @return true结束 false未结束
      */
     private boolean isTimeOut() {
-        if (mday==0 && mhour==0 && mmin==0 && msecond==0) {
-            return true;
-        }else {
-            return false;
-        }
+        return mday == 0 && mhour == 0 && mmin == 0 && msecond == 0;
     }
 
 
@@ -366,7 +400,7 @@ public class TimerView extends TextView implements Runnable,ViewTreeObserver.OnG
     }
 
     public interface onTimeOutListener {
-        void onTimeOut();
+        public abstract void onTimeOut();
     }
 
     @IntDef({TIMETYPE_MS, TIMETYPE_S, TIMETYPE_M, TIMETYPE_H})

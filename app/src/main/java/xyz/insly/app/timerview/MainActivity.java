@@ -1,16 +1,47 @@
 package xyz.insly.app.timerview;
 
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+
+    @Bind(R.id.timerview)
+    TimerView timerview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        Typeface font = Typeface.createFromAsset(getAssets(), "font/KAISER.TTF");
+        timerview.setTypeface(font);
+        timerview.setTime(120, TimerView.TIMETYPE_S);
+        if (!timerview.getRunning()) {
+            timerview.start();
+        }
+        timerview.setOnTimeOutListener(new TimerView.onTimeOutListener() {
+            @Override
+            public void onTimeOut() {
+                Log.d(TAG, "onTimeOut: time out!");
+            }
+        });
+        timerview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "click!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

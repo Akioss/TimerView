@@ -14,9 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:itextColor="@color/white"
         app:iradius="5dp"
         app:idotColor="@color/teal"
         app:ibackground="@color/orange"
+        app:itextSize="26sp"
         />
 
 </RelativeLayout>
