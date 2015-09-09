@@ -11,14 +11,13 @@
 
     <xyz.insly.app.timerview.TimerView
         android:id="@+id/timerview"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         app:itextColor="@color/white"
         app:iradius="5dp"
         app:idotColor="@color/teal"
         app:ibackground="@color/orange"
-        app:itextSize="26sp"
+        app:itextSize="30sp"
         />
 
 </RelativeLayout>

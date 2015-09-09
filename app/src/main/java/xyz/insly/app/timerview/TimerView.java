@@ -22,7 +22,7 @@ import android.widget.TextView;
  * Create Date: 15/9/2.
  * Package: xyz.insly.app.myutils.widgets
  * Discription:
- * Version: 1.0
+ * Version: 1.0.0
  * ---------------------------------------------------------------------------------------------------------------
  * Modified By:
  * Modified Date:
@@ -36,7 +36,6 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
      * wantsize默认的宽高
      */
     private static final int DEFULT_WIDTH = 300;
-    private static final int DEFULT_HEIGHT = 80;
 
     /**
      * 传入时间的类型 ms毫秒 s秒 m分钟 h小时
@@ -223,6 +222,8 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
      * @param borderw 色块间隔
      */
     private void drawTime(Canvas canvas, float blockw, float blockh, float borderw) {
+        float hoffset;
+        float voffset;
 
         paths[0].addRect(0f, 0f, blockw, blockh, Path.Direction.CW);
         paths[1].addRect(blockw + borderw, 0f, blockw * 2 + borderw, blockh, Path.Direction.CW);
@@ -237,10 +238,19 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
         /**
          * 使时间数字在色块中间
          */
-        float tw = mTextPaint.measureText(String.valueOf(mhour));
-        canvas.drawTextOnPath(getHour(), paths[0], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
-        canvas.drawTextOnPath(getMin(), paths[1], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
-        canvas.drawTextOnPath(getSecond(), paths[2], (blockw - tw) / 2, (blockh + textSize) / 2, mTextPaint);
+        float tw = mTextPaint.measureText(getHour());
+        hoffset = tw < blockw ? (blockw - tw) / 2 : (tw - blockw) / 2;
+        voffset = textSize < blockh ? (blockh + textSize) / 2 : blockh / 2;
+        Log.d(TAG, "drawTime: width: " + blockw);
+        Log.d(TAG, "drawTime: height: " + blockh);
+        Log.d(TAG, "drawTime: tw: " + tw);
+        Log.d(TAG, "drawTime: tsize: " + textSize);
+        Log.d(TAG, "drawTime: hoffset: " + hoffset);
+        Log.d(TAG, "drawTime: voffset: " + voffset);
+        Log.d(TAG, "//////////////////////");
+        canvas.drawTextOnPath(getHour(), paths[0], hoffset, voffset, mTextPaint);
+        canvas.drawTextOnPath(getMin(), paths[1], hoffset, voffset, mTextPaint);
+        canvas.drawTextOnPath(getSecond(), paths[2], hoffset, voffset, mTextPaint);
 
         canvas.restore();
     }
@@ -291,7 +301,7 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
     }
 
     /**
-     * 对时间进行格式化 1-01 2-02
+     * 对时间进行格式化 ex:1->01 2->02
      * @return  时间字符串
      */
     private String getDay() {
@@ -395,7 +405,6 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
 
     /**
      * 设置倒计时结束监听
-     *
      * @param listener listener
      */
     public void setOnTimeOutListener(onTimeOutListener listener) {

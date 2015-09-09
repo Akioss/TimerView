@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Typeface font = Typeface.createFromAsset(getAssets(), "font/KAISER.TTF");
-        timerview.setTypeface(font);
+//        timerview.setTypeface(font);
         timerview.setTime(120, TimerView.TIMETYPE_S);
         if (!timerview.getRunning()) {
             timerview.start();
