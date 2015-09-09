@@ -1,20 +1,19 @@
 package xyz.insly.app.timerview;
 
+import android.annotation.SuppressLint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
-
     @Bind(R.id.timerview)
     TimerView timerview;
 
@@ -24,25 +23,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        /**
+         * 可以设置时间数字的TypeFace
+         */
         Typeface font = Typeface.createFromAsset(getAssets(), "font/KAISER.TTF");
-//        timerview.setTypeface(font);
+        timerview.setTypeface(font);
+        /**
+         * TimerView.TIMETYPE_MS 传入参数单位为毫秒
+         * TimerView.TIMETYPE_S 传入参数单位为秒
+         * TimerView.TIMETYPE_M 传入参数单位为分钟
+         * TimerView.TIMETYPE_H 传入参数单位为小时
+         */
         timerview.setTime(120, TimerView.TIMETYPE_S);
         if (!timerview.getRunning()) {
             timerview.start();
         }
+        /**
+         * 倒计时结束的监听
+         */
         timerview.setOnTimeOutListener(new TimerView.onTimeOutListener() {
             @Override
             public void onTimeOut() {
-                Log.d(TAG, "onTimeOut: time out!");
-            }
-        });
-        timerview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "click!", Toast.LENGTH_SHORT).show();
+                handler.sendEmptyMessage(100);
             }
         });
     }
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 100) {
+                Toast.makeText(MainActivity.this, "time out!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
