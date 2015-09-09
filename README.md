@@ -1,5 +1,6 @@
 # Android TimerView
-===================
+=========
+![](https://github.com/Akioss/TimerView/blob/master/ScreenShot/screenshot.jpg)
 
 用于抢购或者团购模块的倒计时View，可以自定义字体，时间色块颜色，冒号颜色，字体颜色及大小。
 
