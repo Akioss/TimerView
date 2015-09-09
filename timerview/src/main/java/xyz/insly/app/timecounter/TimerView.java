@@ -1,4 +1,4 @@
-package xyz.insly.app.timerview;
+package xyz.insly.app.timecounter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+
 
 /*****************************************************************************************************************
  * Author: liyi
