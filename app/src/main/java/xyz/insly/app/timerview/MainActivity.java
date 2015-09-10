@@ -1,18 +1,17 @@
 package xyz.insly.app.timerview;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import xyz.insly.app.timecounter.TimerView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     @Bind(R.id.timerview)
     TimerView timerview;
 
@@ -25,8 +24,8 @@ public class MainActivity extends Activity {
         /**
          * 可以设置时间数字的TypeFace
          */
-        Typeface font = Typeface.createFromAsset(getAssets(), "font/KAISER.TTF");
-        timerview.setTypeface(font);
+//        Typeface font = Typeface.createFromAsset(getAssets(), "font/KAISER.TTF");
+//        timerview.setTypeface(font);
         /**
          * TimerView.TIMETYPE_MS 传入参数单位为毫秒
          * TimerView.TIMETYPE_S 传入参数单位为秒

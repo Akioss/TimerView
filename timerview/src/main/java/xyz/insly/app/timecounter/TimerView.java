@@ -15,7 +15,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
 
 /*****************************************************************************************************************
@@ -29,7 +28,7 @@ import android.widget.TextView;
  * Modified Date:
  * Why & What is modified :
  *****************************************************************************************************************/
-public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocusChangeListener{
+public class TimerView extends View implements ViewTreeObserver.OnGlobalFocusChangeListener{
 
     private static final String TAG = "TimerView";
 
@@ -226,11 +225,24 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
         float hoffset;
         float voffset;
 
-        paths[0].addRect(0f, 0f, blockw, blockh, Path.Direction.CW);
-        paths[1].addRect(blockw + borderw, 0f, blockw * 2 + borderw, blockh, Path.Direction.CW);
-        paths[2].addRect((blockw + borderw) * 2, 0f, width, blockh, Path.Direction.CW);
+        paths[0].moveTo(0f, blockh / 2);
+        paths[0].lineTo(blockw, blockh / 2);
+        paths[0].close();
+        paths[1].moveTo(blockw + borderw, blockh / 2);
+        paths[1].lineTo(blockw * 2 + borderw, blockh / 2);
+        paths[1].close();
+        paths[2].moveTo((blockw + borderw) * 2, blockh / 2);
+        paths[2].lineTo(width, blockh / 2);
+        paths[2].close();
 
         canvas.save();
+//        mPaint.setColor(0xffff0000);
+//        mPaint.setStyle(Paint.Style.STROKE);
+//        mPaint.setStrokeWidth(10f);
+//        canvas.drawPath(paths[0], mPaint);
+//        canvas.drawPath(paths[1], mPaint);
+//        canvas.drawPath(paths[2], mPaint);
+
         /**
          * 字体画笔
          */
@@ -241,7 +253,7 @@ public class TimerView extends TextView implements ViewTreeObserver.OnGlobalFocu
          */
         float tw = mTextPaint.measureText(getHour());
         hoffset = tw < blockw ? (blockw - tw) / 2 : (tw - blockw) / 2;
-        voffset = textSize < blockh ? (blockh + textSize) / 2 : blockh / 2;
+        voffset = textSize / 3;
         Log.d(TAG, "drawTime: width: " + blockw);
         Log.d(TAG, "drawTime: height: " + blockh);
         Log.d(TAG, "drawTime: tw: " + tw);
